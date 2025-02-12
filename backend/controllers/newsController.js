@@ -8,7 +8,7 @@ const sharp = require('sharp');
 // ตั้งค่า multer สำหรับอัปโหลดไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads')); // ใช้ path.join เพื่อกำหนดเส้นทางที่ถูกต้อง
+    cb(null, path.join(__dirname, '../../frontend/public/uploads')); // ใช้ path.join เพื่อกำหนดเส้นทางที่ถูกต้อง
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -76,57 +76,51 @@ const getNewsById = async (req, res, next) => {
   }
 };
 
-// เพิ่มข่าวสารใหม่
+
 const addNews = async (req, res, next) => {
   const { topic, detail, author } = req.body;
   const files = req.files || {}; 
 
-  try {
-    // ลูปเช็คไฟล์ img1 - img5 และตั้งค่าเป็น null หากไม่มีการอัปโหลดไฟล์
-    const imageNames = ['img1', 'img2', 'img3', 'img4', 'img5'];
-    imageNames.forEach((img) => {
-      if (!files[img]) {
-        files[img] = null;
-      }
-    });
+  console.log('Raw req.files:', JSON.stringify(req.files, null, 2));
 
-    // สร้างอาร์เรย์ของ path และชื่อไฟล์สำหรับแต่ละไฟล์
-    const images = imageNames.map((img) => ({
-      path: files[img]?.path ?? null,
-      filename: files[img]?.filename ?? null,
+  try {
+    const imageNames = ['img1', 'img2', 'img3', 'img4', 'img5'];
+
+    const images = imageNames.map(img => ({
+      path: files[img]?.[0]?.path ?? null,
+      filename: files[img]?.[0]?.filename ?? null
     }));
 
-    // เพิ่ม log เพื่อตรวจสอบชื่อไฟล์ที่ถูกอัปโหลด
-    console.log('Uploaded file names:', images.map(image => image.filename));
+    console.log('Extracted image filenames:', images.map(image => image.filename));
 
-    // ปรับคำสั่ง SQL เพื่อรวมชื่อไฟล์ลงในฐานข้อมูล
+    // ป้องกัน error โดยใช้ ?? null เพื่อให้แน่ใจว่าไม่มี undefined
+    const replacements = [
+      topic, 
+      detail, 
+      author, 
+      images[0].filename ?? null, 
+      images[1].filename ?? null, 
+      images[2].filename ?? null, 
+      images[3].filename ?? null, 
+      images[4].filename ?? null
+    ];
+
+    console.log('SQL replacements:', replacements);
+
     const query = `
       INSERT INTO tb_news (topic, detail, author, img1, img2, img3, img4, img5)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await db.query(query, {
-      replacements: [
-        topic, 
-        detail, 
-        author, 
-        images[0].filename, 
-        images[1].filename, 
-        images[2].filename, 
-        images[3].filename, 
-        images[4].filename
-      ],
+      replacements,
       type: QueryTypes.INSERT,
     });
 
-    // ตรวจสอบผลลัพธ์และส่ง response
-    if (result[0]) {
-      res.status(201).json({ message: 'News created successfully', id: result[0] });
-    } else {
-      throw createError(500, 'Failed to create news');
-    }
+    console.log('Insert Result:', result);
+    res.status(201).json({ message: 'News created successfully', id: result[0] });
   } catch (err) {
     console.error('Error adding news:', err);
-    next(err); 
+    next(err);
   }
 };
 
@@ -135,26 +129,42 @@ const addNews = async (req, res, next) => {
 
 
 // อัปเดตข่าวสาร
+// อัปเดตข่าวสาร
 const updateNews = async (req, res, next) => {
   const { id } = req.params;
   const { topic, detail, author } = req.body;
   const files = req.files || {};
 
   try {
-    const images = [];
-
-    // ตรวจสอบว่ามีไฟล์ img1
-    if (files.img1) {
-      images[0] = await uploadImages([files.img1])[0];
-    }
+    const imageNames = ['img1', 'img2', 'img3', 'img4', 'img5'];
+    const images = await Promise.all(imageNames.map(async (img, index) => {
+      if (files[img]) {
+        // หากมีไฟล์ที่เกี่ยวข้อง ให้ปรับขนาดภาพและรับชื่อไฟล์
+        const uploadedImages = await uploadImages(files[img]);
+        return uploadedImages[0]; // รับชื่อไฟล์แรกที่ถูกอัปโหลด
+      }
+      return null; // ไม่มีไฟล์ให้ใช้
+    }));
 
     const query = `
       UPDATE tb_news
-      SET topic = ?, detail = ?, author = ?, updated_at = NOW(), img1 = ?
+      SET topic = ?, detail = ?, author = ?, updated_at = NOW(),
+          img1 = ?, img2 = ?, img3 = ?, img4 = ?, img5 = ?
       WHERE id = ?
     `;
+    
     const result = await db.query(query, {
-      replacements: [topic, detail, author, images[0] || null, id],
+      replacements: [
+        topic, 
+        detail, 
+        author, 
+        images[0], 
+        images[1], 
+        images[2], 
+        images[3], 
+        images[4], 
+        id
+      ],
       type: QueryTypes.UPDATE,
     });
 
@@ -164,9 +174,13 @@ const updateNews = async (req, res, next) => {
 
     res.json({ message: 'News updated successfully' });
   } catch (err) {
+    console.error('Error updating news:', err);
     next(err);
   }
 };
+
+
+
 
 // ลบข่าวสาร
 const deleteNews = async (req, res, next) => {

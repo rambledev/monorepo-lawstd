@@ -69,19 +69,16 @@
           :key="newsItem.id"
           @click="showNewsDetail(newsItem)"
         >
-          <img :src="newsItem.img1 || baseImageUrl" alt="Thumbnail" class="w-full h-auto rounded-t" />
+          <!-- ปรับ src ของรูปภาพให้แสดงจาก path ของรูปภาพที่ถูกต้อง -->
+          <img :src="`${path_uploads}/${newsItem.img1}`" alt="Thumbnail" class="w-full h-auto rounded-t" />
           <div class="p-4">
             <label class="text-xl w-full overflow-hidden break-words whitespace-normal">
-  {{ newsItem.topic }}
-</label>
-
-
-
+              {{ newsItem.topic }}
+            </label>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -89,6 +86,7 @@
 import axios from "axios";
 import baseImage from "../assets/hotnews.jpg";
 import Swal from "sweetalert2"; // นำเข้า SweetAlert2
+const path_uploads = "/uploads"; // กำหนด path โดยตรง
 
 export default {
   name: "Home",
@@ -100,6 +98,7 @@ export default {
       baseURL: import.meta.env.VITE_APP_BASE_URL,
       baseImageUrl: baseImage, // กำหนด base image URL ที่นี่
       isShowing: {},
+      path_uploads: path_uploads,
     };
   },
   methods: {
@@ -156,11 +155,11 @@ export default {
         html: `
           <p>${newsItem.detail}</p>
           <div class="news-images" style="display: flex; flex-wrap: wrap;">
-            ${newsItem.img1 ? `<img src="${newsItem.img1}" style="width: 100px; margin: 5px;" />` : ''}
-            ${newsItem.img2 ? `<img src="${newsItem.img2}" style="width: 100px; margin: 5px;" />` : ''}
-            ${newsItem.img3 ? `<img src="${newsItem.img3}" style="width: 100px; margin: 5px;" />` : ''}
-            ${newsItem.img4 ? `<img src="${newsItem.img4}" style="width: 100px; margin: 5px;" />` : ''}
-            ${newsItem.img5 ? `<img src="${newsItem.img5}" style="width: 100px; margin: 5px;" />` : ''}
+            ${newsItem.img1 ? `<img src="${path_uploads}/${newsItem.img1}" style="width: 100px; margin: 5px;" />` : ''}
+            ${newsItem.img2 ? `<img src="${path_uploads}/${newsItem.img2}" style="width: 100px; margin: 5px;" />` : ''}
+            ${newsItem.img3 ? `<img src="${path_uploads}/${newsItem.img3}" style="width: 100px; margin: 5px;" />` : ''}
+            ${newsItem.img4 ? `<img src="${path_uploads}/${newsItem.img4}" style="width: 100px; margin: 5px;" />` : ''}
+            ${newsItem.img5 ? `<img src="${path_uploads}/${newsItem.img5}" style="width: 100px; margin: 5px;" />` : ''}
           </div>
         `,
         showCloseButton: true,

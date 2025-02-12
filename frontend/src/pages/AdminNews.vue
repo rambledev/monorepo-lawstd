@@ -34,6 +34,7 @@
           v-model="newsAuthor"
           id="newsAuthor"
           placeholder="ชื่อผู้เขียน"
+          value="admin"
           class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
         />
       </div>
@@ -100,19 +101,19 @@
           <td class="border px-4 py-2">{{ news.detail }}</td>
           <td class="border px-4 py-2">
             <div v-if="news.img1">
-              <img :src="`${baseURL}/uploads/${news.img1}`" alt="Image 1" class="w-20 h-20 object-cover" />
+              <img :src="`${path_uploads}/${news.img1}`" alt="Image 1" class="w-20 h-20 object-cover" />
             </div>
             <div v-if="news.img2">
-              <img :src="`${baseURL}/uploads/${news.img2}`" alt="Image 2" class="w-20 h-20 object-cover" />
+              <img :src="`${path_uploads}/${news.img2}`" alt="Image 2" class="w-20 h-20 object-cover" />
             </div>
             <div v-if="news.img3">
-              <img :src="`${baseURL}/uploads/${news.img3}`" alt="Image 3" class="w-20 h-20 object-cover" />
+              <img :src="`${path_uploads}/${news.img3}`" alt="Image 3" class="w-20 h-20 object-cover" />
             </div>
             <div v-if="news.img4">
-              <img :src="`${baseURL}/uploads/${news.img4}`" alt="Image 4" class="w-20 h-20 object-cover" />
+              <img :src="`${path_uploads}/${news.img4}`" alt="Image 4" class="w-20 h-20 object-cover" />
             </div>
             <div v-if="news.img5">
-              <img :src="`${baseURL}/uploads/${news.img5}`" alt="Image 5" class="w-20 h-20 object-cover" />
+              <img :src="`${path_uploads}/${news.img5}`" alt="Image 5" class="w-20 h-20 object-cover" />
             </div>
           </td>
           <td class="border px-4 py-2 text-center">
@@ -139,12 +140,15 @@
 <script>
 import axios from "axios";
 const baseURL = import.meta.env.VITE_APP_BASE_URL;
-console.log(baseURL);
+const path_uploads = "/uploads"; // กำหนด path โดยตรง
+console.log("base_url = "+baseURL);
+console.log("path_upload="+path_uploads);
 export default {
   name: "AdminNews",
   data() {
     return {
       baseURL: baseURL,
+      path_uploads: path_uploads,
       newsList: [],
       newsTitle: "",
       newsContent: "",
@@ -164,6 +168,11 @@ export default {
       try {
         const response = await axios.get(`${this.baseURL}/api/news`);
         this.newsList = response.data;
+
+
+        
+
+
       } catch (error) {
         console.error("Error fetching news:", error);
       }
