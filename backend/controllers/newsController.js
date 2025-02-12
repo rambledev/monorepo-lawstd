@@ -8,7 +8,7 @@ const sharp = require('sharp');
 // ตั้งค่า multer สำหรับอัปโหลดไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, path.join(__dirname, '../../uploads')); // ใช้ path.join เพื่อกำหนดเส้นทางที่ถูกต้อง
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));

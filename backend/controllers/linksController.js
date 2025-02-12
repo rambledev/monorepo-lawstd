@@ -1,5 +1,5 @@
 // controllers/linksController.js
-const db = require('../db'); 
+const db = require('../config/db.js'); 
 const { QueryTypes } = require('sequelize'); 
 
 // ดึงข้อมูลทั้งหมดจาก tb_links
