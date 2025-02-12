@@ -2,80 +2,32 @@
   <div class="p-4">
     <h1 class="text-3xl font-bold mb-4">ระบบสารสนเทศนักศึกษาคณะนิติศาสตร์</h1>
 
-    <!-- ส่วนลิ้งที่เกี่ยวข้อง -->
-    <div style="text-align: left; margin: 0;">
-      <h3 class="text-2xl font-semibold mb-2">ลิ้งที่เกี่ยวข้อง</h3>
-      <ul class="list-none p-0">
-        <template v-for="(group, index) in groupedLinks" :key="index">
-          <li v-if="group.level === 1" class="mb-2">
-            <span
-              v-if="group.link_url"
-              @click="openLink(group.link_url)"
-              class="text-lg font-bold cursor-pointer text-blue-600 hover:underline"
-            >
-              {{ group.name }}
-            </span>
-            <span
-              v-else
-              @click="toggleSubItems(group.id)"
-              class="text-lg font-bold cursor-pointer"
-            >
-              {{ group.name }}
-            </span>
-            <ul v-if="group.subLinks.length > 0" class="ml-4 list-disc">
-              <template v-for="subLink in group.subLinks" :key="subLink.id">
-                <li>
-                  <span
-                    v-if="subLink.link_url"
-                    @click="openLink(subLink.link_url)"
-                    class="cursor-pointer text-md text-blue-600 hover:underline"
-                  >
-                    {{ subLink.name }}
-                  </span>
-                  <span
-                    v-else
-                    @click="toggleSubItems(subLink.id)"
-                    class="cursor-pointer text-md"
-                  >
-                    {{ subLink.name }}
-                  </span>
-                  <ul v-if="isShowing[subLink.id]" class="ml-4 list-disc">
-                    <li v-for="subSubLink in subLink.subLinks" :key="subSubLink.id">
-                      <a
-                        :href="subSubLink.link_url || '#'"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-blue-600 hover:underline"
-                      >
-                        {{ subSubLink.name }}
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-              </template>
-            </ul>
-          </li>
-        </template>
-      </ul>
-    </div>
-
-    <!-- ส่วนข่าวสาร -->
     <div class="mt-8">
       <h2 class="text-2xl font-semibold mb-4">ข่าวสาร</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="space-y-8">
         <div
-          class="border rounded shadow cursor-pointer"
           v-for="newsItem in news"
           :key="newsItem.id"
-          @click="showNewsDetail(newsItem)"
+          class="border-b pb-4"
         >
-          <!-- ปรับ src ของรูปภาพให้แสดงจาก path ของรูปภาพที่ถูกต้อง -->
-          <img :src="`${path_uploads}/${newsItem.img1}`" alt="Thumbnail" class="w-full h-auto rounded-t" />
-          <div class="p-4">
-            <label class="text-xl w-full overflow-hidden break-words whitespace-normal">
-              {{ newsItem.topic }}
-            </label>
+          <div class="flex justify-between">
+            <div>
+              <div class="text-gray-500 text-sm mb-1">{{ formatDate(newsItem.createdAt) }}</div>
+              <h3 class="text-xl font-semibold text-blue-600 hover:underline cursor-pointer" @click="showNewsDetail(newsItem)">
+                {{ newsItem.topic }}
+              </h3>
+              <!-- <p class="text-gray-700 mt-1">{{ newsItem.detail.slice(0, 100) }}...</p> -->
+            </div>
+            <!-- <div class="w-1/3">
+              <img :src="`${path_uploads}/${newsItem.img1}`" alt="Thumbnail" class="w-full h-auto rounded-md" v-if="newsItem.img1" />
+            </div> -->
           </div>
+          <button
+            @click="showNewsDetail(newsItem)"
+            class="mt-2 text-blue-500 font-semibold hover:underline"
+          >
+            Read more →
+          </button>
         </div>
       </div>
     </div>
@@ -111,15 +63,12 @@ export default {
         console.error("Error fetching news:", error);
       }
     },
-    async fetchLinks() {
-      try {
-        const response = await axios.get(`${this.baseURL}/api/links`);
-        this.links = response.data;
-        this.groupLinks();
-      } catch (error) {
-        console.error("Error fetching links:", error);
-      }
+
+    formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(date).toLocaleDateString(undefined, options);
     },
+
     groupLinks() {
       const linkMap = {};
       this.links.forEach((link) => {
@@ -141,6 +90,17 @@ export default {
         }
       });
     },
+    
+    async fetchLinks() {
+      try {
+        const response = await axios.get(`${this.baseURL}/api/links`);
+        this.links = response.data;
+        this.groupLinks();
+      } catch (error) {
+        console.error("Error fetching links:", error);
+      }
+    },
+    
     openLink(url) {
       if (url) {
         window.open(url, "_blank");
