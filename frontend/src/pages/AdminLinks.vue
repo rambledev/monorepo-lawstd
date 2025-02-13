@@ -92,18 +92,28 @@ export default {
     async fetchLinks() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/links`);
-        this.links = response.data; 
+        this.links = response.data;
       } catch (error) {
         console.error('Error fetching links:', error);
       }
     },
     async addLink() {
+      const newLink = {
+        name: this.currentLink.name || null,
+        link_url: this.currentLink.link_url || null,
+        level: this.currentLink.level !== undefined ? this.currentLink.level : null,
+        parent_id: this.currentLink.parent_id !== undefined ? this.currentLink.parent_id : null,
+      };
+
+      // Log for debugging
+      console.log('Adding link with data:', newLink);
+
       try {
-        const response = await axios.post(`${import.meta.env.VITE_APP_BASE_URL}/api/links`, this.currentLink);
+        const response = await axios.post(`${import.meta.env.VITE_APP_BASE_URL}/api/links`, newLink);
         this.links.push(response.data);
         this.resetForms();
       } catch (error) {
-        console.error('Error adding link:', error);
+        console.error('Error adding link:', error.response ? error.response.data : error);
       }
     },
     showEditForm(link) {
@@ -112,12 +122,23 @@ export default {
       this.showManageForm = true;
     },
     async updateLink() {
+      const updatedLink = {
+        name: this.currentLink.name || null,
+        link_url: this.currentLink.link_url || null,
+        level: this.currentLink.level !== undefined ? this.currentLink.level : null,
+        parent_id: this.currentLink.parent_id !== undefined ? this.currentLink.parent_id : null,
+        id: this.currentLink.id
+      };
+
+      // Log for debugging
+      console.log('Updating link with data:', updatedLink);
+
       try {
-        await axios.put(`${import.meta.env.VITE_APP_BASE_URL}/api/links/${this.currentLink.id}`, this.currentLink);
+        await axios.put(`${import.meta.env.VITE_APP_BASE_URL}/api/links/${this.currentLink.id}`, updatedLink);
         this.fetchLinks();
         this.resetForms();
       } catch (error) {
-        console.error('Error updating link:', error);
+        console.error('Error updating link:', error.response ? error.response.data : error);
       }
     },
     async deleteLink(id) {
@@ -126,7 +147,7 @@ export default {
           await axios.delete(`${import.meta.env.VITE_APP_BASE_URL}/api/links/${id}`);
           this.fetchLinks();
         } catch (error) {
-          console.error('Error deleting link:', error);
+          console.error('Error deleting link:', error.response ? error.response.data : error);
         }
       }
     },

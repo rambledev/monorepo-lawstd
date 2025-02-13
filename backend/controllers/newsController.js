@@ -108,8 +108,8 @@ const addNews = async (req, res, next) => {
     console.log('SQL replacements:', replacements);
 
     const query = `
-      INSERT INTO tb_news (topic, detail, author, img1, img2, img3, img4, img5)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tb_news (topic, detail, author, img1, img2, img3, img4, img5,created)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ? , NOW())
     `;
     const result = await db.query(query, {
       replacements,

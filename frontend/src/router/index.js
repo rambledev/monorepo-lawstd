@@ -22,6 +22,7 @@ import SubjectDetail from "../pages/SubjectDetail.vue"; // นำเข้า Su
 import AdminNews from "../pages/AdminNews.vue";
 import AdminSubjectDetail from "../pages/AdminSubjectDetail.vue";
 import AdminLinks from "../pages/AdminLinks.vue";
+import NewsDetail from "../pages/NewsDetail.vue";
 
 
 const routes = [
@@ -41,6 +42,11 @@ const routes = [
         name: 'SubjectDetail',
         component: SubjectDetail 
       },
+      {
+        name: "news-detail",
+        path: "news-detail/:news_id",
+        component: NewsDetail,
+      },
       
     ],
   },
@@ -55,10 +61,7 @@ const routes = [
       { path: "permission", component: AdminSubjectPermission },
       { path: "news", component: AdminNews },
       { path: "links", component: AdminLinks },
-      { 
-        name: "sub-detail",
-        path: "sub-detail/:sub_code", 
-        component: AdminSubjectDetail },
+      
       { 
         path: "studentslist/:subCode", // เส้นทางใหม่สำหรับหน้ารายชื่อนักศึกษา
         name: 'AdminStdList', 
