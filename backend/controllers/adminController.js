@@ -60,7 +60,7 @@ const loginAdmin = async (req, res) => {
     }
 
     res.cookie('adminId', admin.id, { sameSite: 'None', secure: true });
-    res.json({ message: 'Login successful', adminId: admin.id });
+    res.json({ message: 'Login successful', profile: results });
   } catch (err) {
     console.error('Login Error:', err.message);
     res.status(500).json({ message: 'Internal Server Error' });

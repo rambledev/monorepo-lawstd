@@ -5,9 +5,9 @@
       <label for="subject" class="font-semibold">เลือกวิชา:</label>
       <select v-model="selectedSubject" id="subject" class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
         <option value="" disabled>-- เลือกวิชา --</option>
-        <option v-for="subject in subjects" :key="subject.sub_code" :value="subject.sub_code">
-          {{ subject.sub_name }}
-        </option>
+        <option v-for="subject in subjects.data || []" :key="subject.id" :value="subject.sub_code?.trim()">
+  {{ subject.sub_name }}
+</option>
       </select>
 
       <br><br>
@@ -119,7 +119,7 @@ export default {
     }
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/vdos-subject/${subjectCode}`);
+      const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/vdos/${subjectCode}`);
       this.vdos = response.data;
     } catch (error) {
       console.error("Error fetching VDOs:", error);
@@ -178,7 +178,7 @@ export default {
       }
     },
     resetForm() {
-      this.selectedSubject = '';
+      //this.selectedSubject = '';
       this.vdoName = '';
       this.vdoLink = '';
       this.currentVdoId = null;

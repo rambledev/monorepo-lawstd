@@ -12,20 +12,20 @@
 
     <nav class="nav-container mb-4">
       <div class="nav-left">
-        <router-link class="mx-4 nav-button" to="/admin/dashboard">Dashboard</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/subject">จัดการรายวิชา</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/doc">เอกสาร</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/vdo">VDO</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/permission">กำหนดสิทธิ์รายวิชา</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/news">ข่าวหน้าแรก</router-link>
-        <router-link class="mx-4 nav-button" to="/admin/links">ลิ้งค์หน้าแรก</router-link>
+        <router-link class="mx-4 " to="/admin/dashboard">Dashboard</router-link>
+        <router-link class="mx-4 " to="/admin/subject">จัดการรายวิชา</router-link>
+        <router-link class="mx-4 " to="/admin/doc">เอกสาร</router-link>
+        <router-link class="mx-4 " to="/admin/vdo">VDO</router-link>
+        <router-link class="mx-4 " to="/admin/permission">กำหนดสิทธิ์รายวิชา</router-link>
+        <router-link class="mx-4 " to="/admin/news">ข่าวหน้าแรก</router-link>
+        <router-link class="mx-4 " to="/admin/links">ลิ้งค์หน้าแรก</router-link>
       </div>
       <div class="nav-right">
-        <span v-if="userProfile" class="user-info">
-          <button @click="logout" class="logout-button">
+        
+          <button @click="logout" class="logout-button bg-blue-400 text-white p-2 m-2">
             <i class="fas fa-sign-out-alt"></i> Logout
           </button>
-        </span>
+      
       </div>
     </nav>
 
@@ -58,14 +58,17 @@ export default {
     },
     checkAuthentication() {
       const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+      console.log("checkAuthen = "+isAuthenticated);
       if (!isAuthenticated) {
         this.$router.push("/login"); // เปลี่ยนเส้นทางไปยังหน้า Login ถ้าไม่ได้ล็อกอิน
       }
     },
     loadUserProfile() {
       const storedProfile = localStorage.getItem("userProfile");
+      console.log("profile logged = "+storedProfile);
       if (storedProfile) {
-        this.userProfile = JSON.parse(storedProfile); // แปลงข้อมูลที่เก็บใน localStorage เป็น object
+        //this.userProfile = JSON.parse(storedProfile); // แปลงข้อมูลที่เก็บใน localStorage เป็น object
+        this.userProfile = storedProfile;
       }
     },
     checkDarkMode() {

@@ -5,7 +5,7 @@ const { QueryTypes } = require('sequelize');
 // ดึงข้อมูลทั้งหมดจาก tb_links
 exports.getLinks = async (req, res) => {
     try {
-        const results = await db.query('SELECT * FROM tb_links ORDER BY level ASC', {
+        const results = await db.query('SELECT * FROM tb_links ORDER BY id ASC', {
             type: QueryTypes.SELECT
         });
 

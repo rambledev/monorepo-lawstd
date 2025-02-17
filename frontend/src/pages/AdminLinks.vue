@@ -16,14 +16,6 @@
           placeholder="URL ของลิงค์ (ถ้ามี)"
           class="border rounded px-2 py-1 mb-2"
         />
-        <select
-          v-model="currentLink.level"
-          required
-          class="border rounded px-2 py-1 mb-2"
-        >
-          <option value="" disabled>ระดับ</option>
-          <option v-for="i in 5" :key="i" :value="i">{{ i }}</option>
-        </select>
         <input
           v-model.number="currentLink.parent_id"
           placeholder="ID ของ Parent (ถ้ามี)"

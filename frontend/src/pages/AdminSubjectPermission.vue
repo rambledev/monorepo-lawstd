@@ -9,7 +9,6 @@
         <th class="border border-gray-300 px-4 py-2">Id</th>
         <th class="border border-gray-300 px-4 py-2">รหัสวิชา</th>
         <th class="border border-gray-300 px-4 py-2">รายวิชา</th>
-        <th class="border border-gray-300 px-4 py-2">สาขาวิชา</th>
         <th class="border border-gray-300 px-4 py-2">จำนวนหน่วยกิต</th>
         <th class="border border-gray-300 px-4 py-2">Actions</th>
       </tr>
@@ -19,7 +18,6 @@
         <td class="border border-gray-300 px-4 py-2">{{ subject.id }}</td>
         <td class="border border-gray-300 px-4 py-2">{{ subject.sub_code }}</td>
         <td class="border border-gray-300 px-4 py-2">{{ subject.sub_name }}</td>
-        <td class="border border-gray-300 px-4 py-2">{{ subject.sub_program }}</td>
         <td class="border border-gray-300 px-4 py-2">{{ subject.sub_unit }}</td>
         <td class="border border-gray-300 px-4 py-2 text-center">
           <router-link 
@@ -71,14 +69,21 @@
     },
     methods: {
       async fetchSubjects() {
-        try {
-          const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
-          this.subjects = response.data;
-          console.log("axios subject =>"+this.subjects); // ตรวจสอบค่าที่ดึงมาจาก API
-        } catch (error) {
-          console.error("Error fetching subjects:", error);
-        }
-      },
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
+    if (response.data.success && Array.isArray(response.data.data)) {
+      this.subjects = response.data.data; // กำหนด subjects เป็น data ที่อยู่ใน array
+    } else {
+      console.error("API response is not valid:", response.data);
+      this.subjects = []; // กำหนดเป็น array ว่างถ้าไม่ใช่รูปแบบที่ถูกต้อง
+    }
+    console.log("axios subject =>", this.subjects); // ตรวจสอบค่าที่ดึงมาจาก API
+  } catch (error) {
+    console.error("Error fetching subjects:", error);
+  }
+}
+
+,
       async addSubject() {
         try {
           await axios.post(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`, this.newSubject);

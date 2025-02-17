@@ -10,9 +10,6 @@
         <label for="sub_name" class="text-right font-semibold dark:text-white">ชื่อวิชา:</label>
         <input id="sub_name" v-model="newSubject.sub_name" placeholder="ชื่อวิชา" class="border dark:border-gray-600 rounded-lg py-2 px-3 w-full dark:bg-gray-700 dark:text-white" required />
 
-        <label for="sub_program" class="text-right font-semibold dark:text-white">สาขาวิชา:</label>
-        <input id="sub_program" v-model="newSubject.sub_program" placeholder="สาขาวิชา" class="border dark:border-gray-600 rounded-lg py-2 px-3 w-full dark:bg-gray-700 dark:text-white" required />
-
         <label for="sub_unit" class="text-right font-semibold dark:text-white">หน่วยกิต:</label>
         <input id="sub_unit" v-model="newSubject.sub_unit" type="number" placeholder="หน่วยกิต" class="border dark:border-gray-600 rounded-lg py-2 px-3 w-full dark:bg-gray-700 dark:text-white" required />
 
@@ -38,7 +35,6 @@
         <tr>
           <th class="border border-gray-300 px-4 py-2 dark:text-black">รหัสวิชา</th>
           <th class="border border-gray-300 px-4 py-2 dark:text-black">รายวิชา</th>
-          <th class="border border-gray-300 px-4 py-2 dark:text-black">สาขาวิชา</th>
           <th class="border border-gray-300 px-4 py-2 dark:text-black">เทอม</th>
           <th class="border border-gray-300 px-4 py-2 dark:text-black">Actions</th>
         </tr>
@@ -48,7 +44,6 @@
           
           <td class="border border-gray-300 px-4 py-2">{{ subject.sub_code }}<br>{{ subject.sub_teacher }}</td>
           <td class="border border-gray-300 px-4 py-2">{{ subject.sub_name }}<br>{{ subject.sub_unit }} หน่วย</td>
-          <td class="border border-gray-300 px-4 py-2">{{ subject.sub_program }}</td>
           <td class="border border-gray-300 px-4 py-2">{{ subject.sub_term }}</td>
           <td class="border border-gray-300 px-4 py-2 text-center">
             <button class="bg-yellow-500 text-white font-semibold py-1 px-2 rounded-md shadow-md hover:bg-yellow-600 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" @click="editSubject(subject)">แก้ไข</button>
@@ -99,14 +94,19 @@ export default {
   },
   methods: {
     async fetchSubjects() {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
-        this.subjects = response.data;
-        console.log("Fetched subjects:", this.subjects); 
-      } catch (error) {
-        console.error("Error fetching subjects:", error);
-      }
-    },
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
+    if (response.data.success) {
+      this.subjects = response.data.data; // ใช้ response.data.data แทน response.data
+    } else {
+      console.error("Error: API response unsuccessful", response.data);
+    }
+    console.log("Fetched subjects:", this.subjects);
+  } catch (error) {
+    console.error("Error fetching subjects:", error);
+  }
+}
+,
     async addSubject() {
   try {
     await axios.post(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`, this.newSubject);
@@ -146,7 +146,10 @@ async deleteSubject(id) {
   const confirmed = window.confirm("คุณแน่ใจว่าจะลบรายวิชานี้ใช่ไหม?");
   if (confirmed) {
     try {
-      await axios.delete(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects/${id}`);
+      await axios.delete(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects/${id}`)      
+  .then(response => console.log("Deleted:", response.data))
+  .catch(error => console.error("Error deleting:", error.response?.data || error));
+
       await this.fetchSubjects(); // โหลดข้อมูลใหม่
     } catch (error) {
       console.error("Error deleting subject:", error);

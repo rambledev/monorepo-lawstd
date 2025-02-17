@@ -47,7 +47,6 @@ const routes = [
         path: "news-detail/:news_id",
         component: NewsDetail,
       },
-      
     ],
   },
   {
@@ -61,7 +60,6 @@ const routes = [
       { path: "permission", component: AdminSubjectPermission },
       { path: "news", component: AdminNews },
       { path: "links", component: AdminLinks },
-      
       { 
         path: "studentslist/:subCode", // เส้นทางใหม่สำหรับหน้ารายชื่อนักศึกษา
         name: 'AdminStdList', 

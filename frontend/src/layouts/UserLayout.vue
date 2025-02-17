@@ -16,11 +16,11 @@
         <router-link class="mx-4 nav-link" to="/subject">Learning</router-link>
       </div>
       <div class="nav-right">
-        <span v-if="userProfile" class="user-info">
+       
           <button @click="logout" class="logout-button">
             <i class="fas fa-sign-out-alt"></i> Logout
           </button>
-        </span>
+      
       </div>
     </nav>
 

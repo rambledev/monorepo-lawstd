@@ -5,9 +5,11 @@
       <label for="subject" class="font-semibold">เลือกวิชา:</label>
       <select v-model="selectedSubject" id="subject" class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
         <option value="" disabled>-- เลือกวิชา --</option>
-        <option v-for="subject in subjects" :key="subject.sub_code" :value="subject.sub_code">
-          {{ subject.sub_name }}
-        </option>
+        <option v-for="subject in subjects.data || []" :key="subject.id" :value="subject.sub_code?.trim()">
+  {{ subject.sub_name }}
+</option>
+
+        
       </select>
 
       <br><br>
@@ -94,23 +96,37 @@ export default {
     };
   },
   watch: {
-    selectedSubject(newSubject) {
-      this.fetchDocsBySubject(newSubject);
+  selectedSubject(newSubject) {
+    console.log('Subjects:', this.subjects);
+    console.log('Subjects Data:', this.subjects?.data);
+    console.log('Selected Subject:', newSubject);
+
+    if (!newSubject) {
+      console.warn('Selected Subject is null or undefined');
+      return;
     }
-  },
+
+    // ใช้ trim() ป้องกันปัญหา \t หรือช่องว่างที่ไม่ต้องการ
+    this.fetchDocsBySubject(newSubject.trim());
+  }
+}
+
+,
   created() {
     this.fetchSubjects(); 
   },
   methods: {
     async fetchSubjects() {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
-        if (!response.ok) throw new Error('Failed to fetch subjects');
-        this.subjects = await response.json();
-      } catch (error) {
-        console.error("Error fetching subjects:", error);
-      }
-    },
+  try {
+    const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/subjects`);
+    if (!response.ok) throw new Error('Failed to fetch subjects');
+    this.subjects = await response.json();
+    console.log("Subjects data:", this.subjects); // ตรวจสอบค่าที่ได้
+  } catch (error) {
+    console.error("Error fetching subjects:", error);
+  }
+}
+,
     async fetchDocsBySubject(subjectCode) {
       if (!subjectCode) {
         this.docs = [];
@@ -118,6 +134,7 @@ export default {
       }
 
       try {
+        console.log("🔹 Selected Subject Code:", subjectCode);
         const url = `${import.meta.env.VITE_APP_BASE_URL}/api/docs/doc-subject/${subjectCode}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Failed to fetch documents from ${url}`);
@@ -129,7 +146,7 @@ export default {
     async addDoc() {
       if (this.selectedSubject && this.fileName && this.fileLink) {
         try {
-          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/doc`, {
+          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/docs`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -160,7 +177,7 @@ export default {
     async updateDoc() {
       if (this.currentDocId && this.selectedSubject && this.fileName && this.fileLink) {
         try {
-          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/doc/${this.currentDocId}`, {
+          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/docs/${this.currentDocId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
@@ -185,7 +202,7 @@ export default {
     async deleteDoc(docId) {
       if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารนี้?")) {
         try {
-          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/doc/${docId}`, {
+          const response = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/docs/${docId}`, {
             method: 'DELETE'
           });
           if (!response.ok) throw new Error('Failed to delete document');
@@ -196,7 +213,7 @@ export default {
       }
     },
     resetForm() {
-      this.selectedSubject = '';
+      //this.selectedSubject = '';
       this.fileName = '';
       this.fileLink = '';
       this.currentDocId = null;

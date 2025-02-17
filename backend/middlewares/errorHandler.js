@@ -13,4 +13,4 @@ const createError = (status, message) => {
     });
   };
   
-  module.exports = errorHandler;
+  module.exports = { createError, errorHandler };

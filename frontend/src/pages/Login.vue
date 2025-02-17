@@ -81,6 +81,10 @@ export default {
       if (result.message === "Login successful") {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userProfile', JSON.stringify(result.profile));
+        console.log("++ result.profile="+result.profile);
+
+        const storedProfile = localStorage.getItem("userProfile");
+        console.log("++ localStorage="+storedProfile);
         this.$router.push('/admin/dashboard');  // เปลี่ยนเส้นทางไปหน้า Admin Dashboard
       } else {
         this.errorMessage = result.message || 'Login failed. Please try again.';
@@ -133,7 +137,7 @@ export default {
               console.log("FACULTYNAME = " + userFaculty);
 
               if (userTypeName === "นักศึกษา") {
-                this.$router.push('/student/home');
+                this.$router.push('/subject');
               } else if (userTypeName === "สายสนับสนุน" || userTypeName === "สายวิชาการ") {
                 this.$router.push('/teacher/dashboard');
               } else {

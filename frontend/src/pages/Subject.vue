@@ -6,11 +6,11 @@
         <tbody>
           <tr v-for="subject in paginatedSubjects" :key="subject.id" class="hover:bg-gray-100">
             <td class="border border-gray-300 px-4 py-2">
-              <label class="font-bold">{{ subject.sub_name }}</label>
+              <label class="font-bold">{{ subject.sub_name }} <br> {{ subject.sub_code }}</label>
               <br>ผู้สอน : {{ subject.sub_teacher }}
               <br>
               เทอม : {{ subject.sub_term }}
-              <br> {{ subject.sub_unit }} หน่วย
+              
               <br>
               <button @click="viewSubjectDetail(subject.sub_code)" class="bg-primary text-white font-semibold py-1 px-2 rounded-md shadow-md hover:bg-red-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 เลือก
@@ -73,9 +73,13 @@ export default {
     console.error("Error fetching subjects:", error);
   }
 },
-    viewSubjectDetail(subCode) {
-      this.$router.push({ name: 'SubjectDetail', params: { sub_code: subCode } });
-    },
+viewSubjectDetail(subCode) {
+  this.$router.push({ 
+    name: 'SubjectDetail', 
+    params: { sub_code: subCode.trim() } 
+  });
+}
+,
     changePage(pageNumber) {
       this.currentPage = pageNumber;
     },

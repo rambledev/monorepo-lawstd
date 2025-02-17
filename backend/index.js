@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const path = require('path');
 const db = require('./config/db');
-const errorHandler = require('./middlewares/errorHandler');
+const { errorHandler } = require('./middlewares/errorHandler');
 
 // Routes
 const adminRoutes = require('./routes/adminRoutes');
@@ -16,6 +16,7 @@ const vdoRoutes = require('./routes/vdoRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const linksRoutes = require('./routes/linksRouter');
 const stdRouters = require('./routes/stdRoutes');
+const statRouters = require('./routes/statRoutes');
 
 const app = express();
 const PORT = 5000;
@@ -48,6 +49,7 @@ app.use('/api/vdos', vdoRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/links', linksRoutes);
 app.use('/api/students', stdRouters);
+app.use('/api/stat', statRouters);
 
 // Error Handling Middleware
 app.use(errorHandler);
