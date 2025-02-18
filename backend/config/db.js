@@ -1,15 +1,15 @@
 const { Sequelize } = require('sequelize');
 
 // ตั้งค่าตัวแปรการเชื่อมต่อฐานข้อมูลโดยตรง
-//const DB_HOST = '202.29.22.52';
-const DB_HOST = 'localhost';
+const DB_HOST = '202.29.22.52';
+//const DB_HOST = 'localhost';
 const DB_USER = 'root';
-//const DB_PASSWORD = 'A8035725q6q7FSSLbfGdkfqT72fcwGD69eQO5KmeO8Sakr3PFHll9asHkWkzpq0R';
-const DB_PASSWORD = 'root';
-//const DB_NAME = 'db_lawstd';
-const DB_NAME = 'db_laws';
-//const DB_PORT = 8485;
-const DB_PORT = 3306;
+const DB_PASSWORD = 'A8035725q6q7FSSLbfGdkfqT72fcwGD69eQO5KmeO8Sakr3PFHll9asHkWkzpq0R';
+//const DB_PASSWORD = 'root';
+const DB_NAME = 'db_lawstd';
+//const DB_NAME = 'db_laws';
+const DB_PORT = 8485;
+//const DB_PORT = 3306;
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
