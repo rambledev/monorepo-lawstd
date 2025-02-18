@@ -11,13 +11,14 @@
           id="newsTitle"
           placeholder="หัวข้อข่าว"
           class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          required
         />
       </div>
       <br />
       <div class="form-group">
         <label class="font-semibold">รายละเอียดข่าว:</label>
         <div ref="editor" class="editor h-64"></div>
-        <input type="hidden" v-model="newsContent" />
+        <input type="hidden" v-model="newsContent" required />
       </div>
       <br />
       <div class="form-group">
@@ -30,6 +31,7 @@
           placeholder="ชื่อผู้เขียน"
           value="admin"
           class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          required
         />
       </div>
       <br />
@@ -170,8 +172,21 @@ export default {
           [{ 'color': [] }, { 'background': [] }],
           [{ 'align': [] }], // จัดชิด
           ['clean'],
-          ['customAlign'] // ปุ่มจัดชิดที่เราจะสร้างเอง
-        ]
+          [{'customAlign': 'customAlign'}] // ปุ่มจัดชิดที่เราจะสร้างเอง
+        ],
+        handlers: {
+                    'customAlign': () => {
+                        const selectedText = this.quill.getSelection();
+                        if (selectedText) {
+                            const alignValue = prompt("Enter alignment: center"); // ให้ผู้ใช้ป้อนการจัดชิด
+                            if (alignValue === 'center') {
+                                this.quill.format('align', alignValue);
+                            }
+                        } else {
+                            alert("Please select some text to center.");
+                        }
+                    }
+                }
       }
     });
 
@@ -299,7 +314,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .editor {
   border: 1px solid #ccc;
   height: 300px; /* ความสูงที่ต้องการสำหรับ editor */

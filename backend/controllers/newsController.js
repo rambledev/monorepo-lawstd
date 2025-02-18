@@ -79,13 +79,18 @@ const getNewsById = async (req, res, next) => {
 
 const addNews = async (req, res, next) => {
   const { topic, detail, author } = req.body;
+  console.log('Received data:', { topic, detail, author });
+  
   const files = req.files || {}; 
-
   console.log('Raw req.files:', JSON.stringify(req.files, null, 2));
 
   try {
-    const imageNames = ['img1', 'img2', 'img3', 'img4', 'img5'];
+    // ตรวจสอบให้แน่ใจว่า Topic, Detail, Author ถูกส่งไป
+    if (!topic || !detail || !author) {
+      return res.status(400).json({ message: 'Topic, detail, and author are required' });
+    }
 
+    const imageNames = ['img1', 'img2', 'img3', 'img4', 'img5'];
     const images = imageNames.map(img => ({
       path: files[img]?.[0]?.path ?? null,
       filename: files[img]?.[0]?.filename ?? null
@@ -93,23 +98,22 @@ const addNews = async (req, res, next) => {
 
     console.log('Extracted image filenames:', images.map(image => image.filename));
 
-    // ป้องกัน error โดยใช้ ?? null เพื่อให้แน่ใจว่าไม่มี undefined
     const replacements = [
-      topic, 
-      detail, 
-      author, 
-      images[0].filename ?? null, 
-      images[1].filename ?? null, 
-      images[2].filename ?? null, 
-      images[3].filename ?? null, 
+      topic,
+      detail,
+      author,
+      images[0].filename ?? null,
+      images[1].filename ?? null,
+      images[2].filename ?? null,
+      images[3].filename ?? null,
       images[4].filename ?? null
     ];
 
     console.log('SQL replacements:', replacements);
 
     const query = `
-      INSERT INTO tb_news (topic, detail, author, img1, img2, img3, img4, img5,created)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ? , NOW())
+      INSERT INTO tb_news (topic, detail, author, img1, img2, img3, img4, img5, created)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
     `;
     const result = await db.query(query, {
       replacements,
@@ -120,10 +124,10 @@ const addNews = async (req, res, next) => {
     res.status(201).json({ message: 'News created successfully', id: result[0] });
   } catch (err) {
     console.error('Error adding news:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
     next(err);
   }
 };
-
 
 
 

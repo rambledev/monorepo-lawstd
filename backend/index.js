@@ -17,6 +17,7 @@ const newsRoutes = require('./routes/newsRoutes');
 const linksRoutes = require('./routes/linksRouter');
 const stdRouters = require('./routes/stdRoutes');
 const statRouters = require('./routes/statRoutes');
+const dashRouters = require('./routes/dashboardRoutes');
 
 const app = express();
 const PORT = 5000;
@@ -50,6 +51,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/links', linksRoutes);
 app.use('/api/students', stdRouters);
 app.use('/api/stat', statRouters);
+app.use('/api/dash', dashRouters);
 
 // Error Handling Middleware
 app.use(errorHandler);

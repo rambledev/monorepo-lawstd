@@ -23,6 +23,7 @@ import AdminNews from "../pages/AdminNews.vue";
 import AdminSubjectDetail from "../pages/AdminSubjectDetail.vue";
 import AdminLinks from "../pages/AdminLinks.vue";
 import NewsDetail from "../pages/NewsDetail.vue";
+import DashboardEX from "../pages/DashboardEX.vue";
 
 
 const routes = [
@@ -37,6 +38,7 @@ const routes = [
       { path: "home", component: Home },
       { path: "subject", component: Subject },
       { path: "vdo", component: Vdo },
+      { path: "dex", component: DashboardEX },
       { 
         path: "subject-detail/:sub_code", // เส้นทางสำหรับ SubjectDetail
         name: 'SubjectDetail',

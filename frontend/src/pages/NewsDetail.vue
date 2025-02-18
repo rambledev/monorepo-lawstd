@@ -2,7 +2,8 @@
   <div>
     <div v-if="news">
       <h1 class="text-2xl font-bold text-left">{{ news.topic }}</h1>
-      <p class="text-gray-700 text-left" v-html="news.detail"></p> <!-- ใช้ v-html ที่นี่ -->
+      <hr>
+      <p class="text-gray-700 text-left" v-html="news.detail"></p> <!-- ใช้ v-html เพื่อแสดง HTML -->
 
       <div v-if="newsImages.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-4">
         <img 
@@ -36,68 +37,77 @@
     </div>
   </div>
 </template>
-  
-  <script>
-  import { useRoute, useRouter } from "vue-router";
-  import axios from "axios";
-  
-  export default {
-    name: "NewsDetail",
-    data() {
-      return {
-        news: null,
-        baseURL: import.meta.env.VITE_APP_BASE_URL,
-        path_uploads: "/uploads",
-        isModalOpen: false,
-        currentImage: "",
-        newsImages: [],
-      };
+
+<script>
+import { useRoute } from "vue-router";
+import axios from "axios";
+
+export default {
+  name: "NewsDetail",
+  data() {
+    return {
+      news: null,
+      baseURL: import.meta.env.VITE_APP_BASE_URL,
+      path_uploads: "/uploads",
+      isModalOpen: false,
+      currentImage: "",
+      newsImages: [],
+    };
+  },
+  async mounted() {
+    await this.fetchNews();
+  },
+  methods: {
+    async fetchNews() {
+      const route = useRoute();
+      const newsId = route.params.news_id; 
+      try {
+        const response = await axios.get(`${this.baseURL}/api/news/${newsId}`);
+        this.news = response.data; 
+        this.newsImages = [this.news.img1, this.news.img2, this.news.img3, this.news.img4, this.news.img5]
+          .filter((img) => img)
+          .map((img) => `${this.path_uploads}/${img}`);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+      }
     },
-    async mounted() {
-      await this.fetchNews();
+    openModal(image) {
+      this.currentImage = image;
+      this.isModalOpen = true;
     },
-    methods: {
-      async fetchNews() {
-        const route = useRoute();
-        const newsId = route.params.news_id; 
-        try {
-          const response = await axios.get(`${this.baseURL}/api/news/${newsId}`);
-          this.news = response.data; 
-          this.newsImages = [this.news.img1, this.news.img2, this.news.img3, this.news.img4, this.news.img5]
-            .filter((img) => img)
-            .map((img) => `${this.path_uploads}/${img}`);
-        } catch (error) {
-          console.error("Error fetching news:", error);
-        }
-      },
-      openModal(image) {
-        this.currentImage = image;
-        this.isModalOpen = true;
-      },
-      closeModal() {
-        this.isModalOpen = false;
-      },
-      goBack() {
-        this.$router.push('/home'); // กลับไปหน้าหลัก
-      },
+    closeModal() {
+      this.isModalOpen = false;
     },
-  };
-  </script>
-  
-  <style scoped>
-  .fixed {
-    position: fixed;
-  }
-  .bg-black {
-    background-color: rgba(0, 0, 0, 0.75);
-  }
-  .max-w-full {
-    max-width: 100%;
-  }
-  .max-h-full {
-    max-height: 100%;
-  }
-  .cursor-pointer {
-    cursor: pointer;
-  }
-  </style>
+    goBack() {
+      this.$router.push('/home'); // กลับไปหน้าหลัก
+    },
+  },
+};
+</script>
+
+<style >
+.fixed {
+  position: fixed;
+}
+.bg-black {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+.max-w-full {
+  max-width: 100%;
+}
+.max-h-full {
+  max-height: 100%;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.ql-align-right {
+  text-align: right;
+}
+.ql-align-center {
+  text-align: center;
+}
+.ql-align-left {
+  text-align: left;
+}
+</style>

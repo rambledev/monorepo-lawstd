@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -61,44 +63,54 @@ export default {
       const apiUrl = `${import.meta.env.VITE_APP_BASE_URL}/api/admin/login`;
 
       try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: this.username,
-            password: this.password,
-          }),
+        const response = await axios.post(apiUrl, {
+          username: this.username,
+          password: this.password,
         });
 
-        const result = await response.json();
+        const result = response.data;
         console.log('API Response:', result); // เพื่อดูว่ามีการตอบกลับที่ถูกต้องหรือไม่
-  if (response.ok) {
-    
-    if (response.ok) {
-      // ตรวจสอบว่ามีการส่งกลับข้อความ login successful หรือไม่
-      if (result.message === "Login successful") {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userProfile', JSON.stringify(result.profile));
-        console.log("++ result.profile="+result.profile);
+        
+        if (response.status === 200) {
+          if (result.message === "Login successful") {
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('userProfile', JSON.stringify(result.profile));
+            console.log("++ result.profile=" + result.profile);
 
-        const storedProfile = localStorage.getItem("userProfile");
-        console.log("++ localStorage="+storedProfile);
-        this.$router.push('/admin/dashboard');  // เปลี่ยนเส้นทางไปหน้า Admin Dashboard
-      } else {
-        this.errorMessage = result.message || 'Login failed. Please try again.';
-      }
-    } else {
-      this.errorMessage = 'Server error. Please try again later.';
-    }
+            const user = result.profile[0]; // ใช้ result.profile[0] เพื่อเข้าถึงข้อมูลผู้ใช้แรก
+            const usertype = user.usertype; // ดึงค่า usertype จาก user
 
-  } else {
-    this.errorMessage = 'Server error. Please try again later.';
-  }
+            // POST JSON username ไปยัง /api/dash/addlogged
+            await this.addLoggedUser(this.username,usertype);
+
+            const storedProfile = localStorage.getItem("userProfile");
+            console.log("++ localStorage=" + storedProfile);
+            this.$router.push('/admin/dashboard');  // เปลี่ยนเส้นทางไปหน้า Admin Dashboard
+          } else {
+            this.errorMessage = result.message || 'Login failed. Please try again.';
+          }
+        } else {
+          this.errorMessage = 'Server error. Please try again later.';
+        }
+
       } catch (error) {
         console.error('Error:', error);
         this.errorMessage = 'An error occurred. Please try again.';
+      }
+    },
+
+    async addLoggedUser(username,usertype) {
+      const apiLoggedUrl = `${import.meta.env.VITE_APP_BASE_URL}/api/dash/addlogged`;
+      console.log("Sending username:", username);
+      console.log("Sending usertype:", usertype);
+      try {
+        await axios.post(apiLoggedUrl, {
+          username: username,
+          usertype: usertype
+        });
+        console.log("Logged username added successfully.");
+      } catch (error) {
+        console.error('Error adding logged username:', error);
       }
     },
 
@@ -137,8 +149,11 @@ export default {
               console.log("FACULTYNAME = " + userFaculty);
 
               if (userTypeName === "นักศึกษา") {
+                await this.addLoggedUser(this.username,"student");
                 this.$router.push('/subject');
+                
               } else if (userTypeName === "สายสนับสนุน" || userTypeName === "สายวิชาการ") {
+                await this.addLoggedUser(this.username,"teacher");
                 this.$router.push('/teacher/dashboard');
               } else {
                 this.errorMessage = 'ประเภทผู้ใช้นี้ไม่ถูกต้อง';

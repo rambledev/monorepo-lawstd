@@ -27,7 +27,8 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import axios from "axios";
 import { Chart, registerables } from "chart.js";
 import { BarChart } from "vue-chart-3";
 
@@ -39,21 +40,69 @@ export default defineComponent({
   },
   setup() {
     const summary = ref([
-      { title: "รายวิชาที่เปิด", value: 12 },
-      { title: "ผู้เข้าใช้งาน", value: 350 },
-      { title: "ข่าวที่เผยแพร่", value: 8 },
-      { title: "อัปโหลดล่าสุด", value: "5 รายการ" },
+      { title: "รายวิชาที่เปิด", value: 0 },
+      { title: "ผู้เข้าใช้งาน", value: 0 },
+      { title: "ข่าวที่เผยแพร่", value: 0 },
+      { title: "รายการอัปโหลด", value: 0 },
     ]);
 
     const userChartData = ref({
-      labels: ["นักเรียน", "อาจารย์", "บุคลากร"],
-      datasets: [{ label: "ผู้ใช้งาน", backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"], data: [250, 70, 30] }],
+      labels: [],
+      datasets: [{ label: "ผู้ใช้งาน", backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"], data: [] }],
     });
 
     const courseViewChartData = ref({
-      labels: ["Math", "Science", "History", "English"],
-      datasets: [{ label: "เข้าชม", backgroundColor: ["#ef4444", "#22c55e", "#3b82f6", "#eab308"], data: [120, 200, 150, 180] }],
+      labels: [],
+      datasets: [{ label: "top 5 vdo", backgroundColor: ["#ef4444", "#22c55e", "#3b82f6", "#eab308"], data: [] }],
     });
+
+    const fetchData = async () => {
+      try {
+        const baseURL = import.meta.env.VITE_APP_BASE_URL;
+
+        // ดึงข้อมูลรายวิชาทั้งหมด
+        const subjectsRes = await axios.get(`${baseURL}/api/dash/total-subjects`);
+        summary.value[0].value = subjectsRes.data.total; 
+
+        // ดึงข้อมูลผู้ใช้งาน
+        const usersRes = await axios.get(`${baseURL}/api/dash/total-users`);
+        summary.value[1].value = usersRes.data.total;
+
+        // ดึงข้อมูลข่าวสาร
+        const newsRes = await axios.get(`${baseURL}/api/dash/total-news`);
+        summary.value[2].value = newsRes.data.total;
+
+        // ดึงข้อมูลไฟล์อัปโหลดล่าสุด
+        const uploadsRes = await axios.get(`${baseURL}/api/dash/total-uploads`);
+        summary.value[3].value = uploadsRes.data.total ? `${uploadsRes.data.total} รายการ` : "ไม่มีข้อมูล";
+
+        // ดึงข้อมูลสถิติผู้ใช้
+        const userStatsRes = await axios.get(`${baseURL}/api/dash/usergraph`); // เปลี่ยนจาก /total-users เป็น /usergraph
+        userChartData.value = {
+          labels: userStatsRes.data.labels, // labels คือ admin, student, teacher
+          datasets: [{ 
+            label: "ผู้ใช้งาน",
+            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+            data: userStatsRes.data.data // จำนวนผู้ใช้ในแต่ละประเภท
+          }],
+        };
+
+        // ดึงข้อมูลการเข้าชมรายวิชา
+        const courseViewRes = await axios.get(`${baseURL}/api/dash/vdograph`); // ดึงข้อมูลจาก /api/dash/vdograph
+        courseViewChartData.value = {
+          labels: courseViewRes.data.labels, // ชื่อวิชาที่เข้าชม
+          datasets: [{ 
+            label: "เข้าชม",
+            backgroundColor: ["#ef4444", "#22c55e", "#3b82f6", "#eab308"], 
+            data: courseViewRes.data.data // จำนวนการเข้าชม
+          }],
+        };
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    onMounted(fetchData);
 
     return { summary, userChartData, courseViewChartData };
   },
